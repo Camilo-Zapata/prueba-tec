@@ -53,6 +53,11 @@ $tareas = $result->fetch_all(MYSQLI_ASSOC);
                                 <?php endif; ?>
 
                                 <a href="edit_task.php?id=<?= $tarea['id']; ?>" class="btn btn-warning">Editar</a>
+
+                                <form action="delete_task.php" method="POST" class="d-inline-block">
+                                    <input type="hidden" name="task_id" value="<?= $tarea['id']; ?>">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?');">Eliminar</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -62,6 +67,33 @@ $tareas = $result->fetch_all(MYSQLI_ASSOC);
             <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        // Funcionalidad para marcar tareas como completadas usando fetch (opcional)
+        document.querySelectorAll('.marcar-completada').forEach(button => {
+            button.addEventListener('click', function() {
+                const taskId = this.getAttribute('data-id');
+
+                fetch('mark_completed.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: taskId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.innerHTML = 'Completada';
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-success');
+                        this.setAttribute('disabled', 'true');
+                    }
+                })
+                .catch(error => console.error('Error en la solicitud:', error));
+            });
+        });
+    </script>
 
     <script>
         document.querySelectorAll('.marcar-completada').forEach(button => {
